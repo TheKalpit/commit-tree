@@ -1,0 +1,98 @@
+.mainWrap {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .tableWrap {
+    flex-grow: 1;
+    overflow: auto;
+
+    table {
+      table-layout: auto;
+    }
+
+    th, td {
+      white-space: nowrap;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      background-color: #f0f0f0;
+      z-index: 1;
+
+      tr {
+        border: none;
+
+        th {
+          font-weight: 600;
+        }
+      }
+    }
+
+    tbody {
+      position: relative;
+
+      tr {
+        border: none;
+      }
+    }
+  }
+
+}
+
+.paginationWrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 10px 20px;
+  color: #999;
+
+  .perPageWrap, .btnWrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+.svgRow {
+  border: none !important;
+  overflow: hidden;
+
+  td {
+    height: 0;
+    position: initial;
+  }
+}
+
+.connectorSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  pointer-events: none;
+  overflow: visible;
+  stroke: rgb(149, 196, 188);
+  stroke-width: 1;
+}
+
+.commitDot {
+  border-radius: 100%;
+  display: inline-block;
+
+  &[data-version="branch"] {
+    background-color: rgb(43, 97, 148);
+  }
+
+  &[data-version="release"] {
+    background-color: rgb(100, 51, 94);
+  }
+
+  &[data-version="commit"] {
+    background-color: rgb(149, 196, 188);
+  }
+}
