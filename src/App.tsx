@@ -24,6 +24,7 @@ import type {
   OptionOnSelectData,
   SelectionEvents,
 } from "@fluentui/react-combobox";
+import * as React from "react";
 
 const totalRecords = sampleData.length;
 
@@ -32,12 +33,16 @@ function App() {
     Record<string, PositionType>
   >({});
   const containerRef = useRef<HTMLTableSectionElement | null>(null);
+
   const [perPage, setPerPage] = useState("10");
   const [page, setPage] = useState(1);
+  const [hoveredHash, setHoveredHash] = useState<string | undefined>(undefined);
 
   const totalPages = Math.ceil(totalRecords / parseInt(perPage));
   const start = (page - 1) * parseInt(perPage);
   const end = start + parseInt(perPage);
+
+  const pageId = useMemo(() => `p-${page}-${perPage}`, [page, perPage]);
 
   const commits: CommitWithLevel[] = useMemo(() => {
     // transform sample data: add level field
@@ -97,6 +102,29 @@ function App() {
     }
   };
 
+  const handleRowMouseOver = (event: React.MouseEvent<HTMLTableRowElement>) => {
+    const hash = event.currentTarget.dataset.hash;
+    setHoveredHash(hash);
+  };
+
+  const handleRowMouseOut = () => {
+    setHoveredHash(undefined);
+  };
+
+  const highlightHashes = useMemo(() => {
+    const hashes = new Set<string>();
+    let currentHash = hoveredHash;
+    commits.forEach((commit) => {
+      if (commit.hash === currentHash) {
+        hashes.add(commit.hash);
+        if (commit.source_hash) {
+          currentHash = commit.source_hash;
+        }
+      }
+    });
+    return hashes;
+  }, [commits, hoveredHash]);
+
   return (
     <div className={styles.mainWrap}>
       <div className={styles.tableWrap}>
@@ -132,11 +160,14 @@ function App() {
                     const endX = endPos.x + COMMIT_DOT_SIZE / 2;
                     const endY = endPos.y + COMMIT_DOT_SIZE / 2;
 
+                    const isHighlighted = highlightHashes.has(commit.hash);
+
                     return (
                       <polyline
-                        key={index}
+                        key={`${index}-${commit.hash}-${pageId}`}
                         points={`${startX},${startY} ${middleX},${middleY} ${endX},${endY}`}
                         fill="none"
+                        strokeWidth={isHighlighted ? 2.5 : 1}
                         strokeLinejoin="miter"
                       />
                     );
@@ -146,12 +177,18 @@ function App() {
             </TableRow>
 
             {commits.map((commit, index) => (
-              <TableRow key={`${index}-${commit.hash}`}>
+              <TableRow
+                key={`${index}-${commit.hash}-${pageId}`}
+                data-hash={commit.hash}
+                onMouseOver={handleRowMouseOver}
+                onMouseOut={handleRowMouseOut}
+              >
                 <TableCell>
                   <CommitCell
                     containerRef={containerRef}
                     data={commit}
                     onPositionChange={handlePositionChange}
+                    isHighlighted={highlightHashes.has(commit.hash)}
                   />
                 </TableCell>
                 <TableCell>{commit.version}</TableCell>
