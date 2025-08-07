@@ -18,6 +18,13 @@ import {
   TableRow,
   Option,
   Button,
+  Dialog,
+  DialogTrigger,
+  DialogSurface,
+  DialogBody,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@fluentui/react-components";
 import { ChevronLeftRegular, ChevronRightRegular } from "@fluentui/react-icons";
 import type {
@@ -177,23 +184,58 @@ function App() {
             </TableRow>
 
             {commits.map((commit, index) => (
-              <TableRow
-                key={`${index}-${commit.hash}-${pageId}`}
-                data-hash={commit.hash}
-                onMouseOver={handleRowMouseOver}
-                onMouseOut={handleRowMouseOut}
-              >
-                <TableCell>
-                  <CommitCell
-                    containerRef={containerRef}
-                    data={commit}
-                    onPositionChange={handlePositionChange}
-                    isHighlighted={highlightHashes.has(commit.hash)}
-                  />
-                </TableCell>
-                <TableCell>{commit.version}</TableCell>
-                <TableCell>{commit.message}</TableCell>
-              </TableRow>
+              <Dialog key={`${index}-${commit.hash}-${pageId}`}>
+                <DialogTrigger disableButtonEnhancement>
+                  <TableRow
+                    data-hash={commit.hash}
+                    onMouseOver={handleRowMouseOver}
+                    onMouseOut={handleRowMouseOut}
+                  >
+                    <TableCell>
+                      <CommitCell
+                        containerRef={containerRef}
+                        data={commit}
+                        onPositionChange={handlePositionChange}
+                        isHighlighted={highlightHashes.has(commit.hash)}
+                      />
+                    </TableCell>
+                    <TableCell>{commit.version}</TableCell>
+                    <TableCell>{commit.message}</TableCell>
+                  </TableRow>
+                </DialogTrigger>
+                <DialogSurface>
+                  <DialogBody>
+                    <DialogTitle>#{commit.hash}</DialogTitle>
+                    <DialogContent>
+                      <Table>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell>Hash</TableCell>
+                            <TableCell>#{commit.hash}</TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Branch</TableCell>
+                            <TableCell>{commit.branch}</TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Version</TableCell>
+                            <TableCell>{commit.version}</TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Message</TableCell>
+                            <TableCell>{commit.message}</TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </DialogContent>
+                    <DialogActions>
+                      <DialogTrigger disableButtonEnhancement>
+                        <Button appearance="secondary">Close</Button>
+                      </DialogTrigger>
+                    </DialogActions>
+                  </DialogBody>
+                </DialogSurface>
+              </Dialog>
             ))}
           </TableBody>
         </Table>
